@@ -1,5 +1,4 @@
-
-from controller.controller import Controller
+from control.controller import Controller
 
 
 def test_sense_environment() -> None:
