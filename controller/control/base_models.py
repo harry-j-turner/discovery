@@ -44,9 +44,5 @@ class MoveAction(BaseModel):
     entityID: str
 
 
-class NullAction(BaseModel):
-    action: Literal["null"] = Field(..., description="Do nothing.")
-
-
-Action = Union[ChatAction, MoveAction, NullAction]
+Action = Union[ChatAction, MoveAction]
 ActionType = TypeAdapter(Action)

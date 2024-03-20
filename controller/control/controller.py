@@ -13,8 +13,7 @@ from control.base_models import (
     Action,
     ActionType,
     ChatAction,
-    MoveAction,
-    NullAction,
+    MoveAction
 )
 
 logger = logging.getLogger(__name__)
@@ -26,16 +25,15 @@ class Controller:
 
         self.base_url = f"{settings.agent_origin}:{settings.agent_port}"
 
+        with open(settings.prompt_template_dir / settings.system_prompt_file, 'r') as f:
+            system_prompt: str = f.read()
+
         model = ChatOpenAI()
         parser = StrOutputParser()
 
-        # TODO: Load prompt from file.
         prompt = ChatPromptTemplate.from_messages(
             [
-                (
-                    "system",
-                    "You are a minecraft bot. The user will provide two bits of information, a datastructure of information about the world called Sense Data. The second is a list of valid actions you can take represented in JSON Schema. You must choose exactly one action to perform and respond with JSON in the correct form for the chosen action's schema.",
-                ),
+                ("system", system_prompt),
                 ("user", "{input}"),
             ]
         )
@@ -63,12 +61,12 @@ class Controller:
 
     def think(self, sense_data: SenseData) -> None:
 
-        actions = [ChatAction, MoveAction, NullAction]
+        # Move to base_models.
+        actions = [ChatAction, MoveAction]
         action_schemas = [action.model_json_schema() for action in actions]
 
         message = f"# Sense Data\n{sense_data.serialise()}\n\n# Actions\n"
         message += json.dumps(action_schemas, indent=2)
-
         response = self.llm.invoke({"input": message})
 
         try:
