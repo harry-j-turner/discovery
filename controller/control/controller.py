@@ -64,8 +64,9 @@ class Controller:
         # Move to base_models.
         actions = [ChatAction, MoveAction]
         action_schemas = [action.model_json_schema() for action in actions]
+        sense_json = sense_data.model_dump()
 
-        message = f"# Sense Data\n{sense_data.serialise()}\n\n# Actions\n"
+        message = f"# Sense Data\n{json.dumps(sense_json, indent=2)}\n\n# Actions\n"
         message += json.dumps(action_schemas, indent=2)
         response = self.llm.invoke({"input": message})
 
